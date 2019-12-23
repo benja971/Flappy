@@ -1,10 +1,12 @@
-import pygame
+import pygame, time
 from random import *
 from pygame.locals import *
 
-def obst1():
+from ctypes import windll
+windll.shcore.SetProcessDpiAwareness(5)
+
+def images():
 	bank={}
-	
 	bank["t1"] = pygame.image.load("Tunnel8.png")
 	bank["t2"] = pygame.image.load("Tunnel7.png")
 	bank["perso"] = pygame.image.load("Dragon1.png").convert_alpha()
@@ -12,99 +14,89 @@ def obst1():
 	return bank
 	
 def monter_perso(y):
-    y-=3
+    y-=10
 
     return y
 
-def descendre_perso(y):
-    y+=3
-    return y
+def NewTuyeaux():
+	for i in range(1):
+		rect = bank["t1"].get_rect()
+		rect.x = randint(300 , 400)
+		rect.y = randint(-100 , 100)
+		mesTuyaux.append(rect)
 
+		rect2 = bank["t2"].get_rect()
+		rect2.x = randint(300 , 400)
+		rect2.y = randint(300 , 500)
+		mesTuyaux2.append(rect2)
 
-fenetre = pygame.display.set_mode((600,600))
+		return mesTuyaux, mesTuyaux2, rect1, rect2
+
+horloge = pygame.time.Clock()
+
+fenetre = pygame.display.set_mode((400,600))
 fond = pygame.image.load("bg2-bell.jpg").convert()
 
-bank = obst1()
+bank = images()
 
 mesTuyaux=[]
-
-ranges = [(850 , 1050),(1250 , 1450)]
-
-for i in range(10):
-	rect = bank["t1"].get_rect()
-	irange = i%2
-	rect.x = randint(ranges[irange][0] , ranges[irange][1])
-	rect.y = randint(-100 , 100)
-	mesTuyaux.append(rect)
-
-x1 = randint(850 , 1050)
-x2 = randint(850 , 1050)
-x3 = randint(1250 , 1450)
-x4 = randint(1250 , 1450)
-x5 = randint(1750 , 1950)
-x6 = randint(1750 , 1950)
-x7 = randint(2350 , 2550)
-x8 = randint(2350 , 2550)
-x9 = randint(2750 , 2950)
-x10= randint(2750 , 2950)
-
-y1 = randint(-100 , 100)
-y2 = y1 + 250
-
-y3 = randint(-100 , 100)
-y4 = y3 + 250
-
-y5 = randint(-100 , 100)
-y6 = y5 + 250
-
-y7 = randint(-100 , 100)
-y8 = y7 + 250
-
-y9 = randint(-100 , 100)
-y10 = y9 + 250
+mesTuyaux2=[]
 
 rectPerso = bank["perso"].get_rect()
-rectPerso.x = 200
-rectPerso.y = 10
+rectPerso.x = 150
+rectPerso.y = 300- rectPerso.h
+
 continuer = True
+i = 0 
+state = "menu"
+
 pygame.key.set_repeat(4, 4)
 
 while continuer:
+	touches = pygame.key.get_pressed()
+	events = pygame.event.get()
 
-	for r in mesTuyaux:
-		if r.x >0:
-			r.x -=1
-
-	for event in pygame.event.get():
-		if event.type == QUIT:
+	if state == "menu":
+		if touches[pygame.K_ESCAPE]:
 			continuer = False
 
-		if event.type == KEYDOWN:
-			if event.key == K_ESCAPE:
-			    continuer = False
-			if event.key == K_UP:
-			    rectPerso.y = monter_perso(rectPerso.y)
-			if event.key == K_DOWN:
-			    rectPerso.y = descendre_perso(rectPerso.y)
+		if touches[pygame.K_SPACE]:
+			state = "jeu "
 
-	if x10 < -300:
-		x1 = randint(850 , 1050)
+		fenetre.blit(fond, (0,0))
 
-	touch = False
-	for r in mesTuyaux:
-		if rectPerso.colliderect(r):
-			print ("Je te touche")
-			touch=True
+	if state == "jeu":
+		i += 1
+		horloge.tick(60)	
+		touch = False
+		rectPerso.y += 3
 
-	if touch == False:
-		print ("je touche pas")
+		if i%100 == 0:
+			NewTuyeaux()		
 
-	fenetre.blit(fond, (0 ,0))
+		if touches[pygame.K_ESCAPE]:
+			state = "menu"
 
-	for r in mesTuyaux:
-		fenetre.blit(bank["t1"], r)
+		if touches[pygame.K_SPACE]:
+			rectPerso.y -= 10
 
-	fenetre.blit(bank["perso"], rectPerso)
+		fenetre.blit(fond, (0 ,0))
+		fenetre.blit(bank["perso"], rectPerso)
+
+		for r in mesTuyaux:
+			r.x -=5
+			fenetre.blit(bank["t1"], r)
+
+			if rectPerso.colliderect(rect1):
+				touch = True
+
+		for t in mesTuyaux2:
+			t.x -=5
+			fenetre.blit(bank["t2"], t)
+
+			if rectPerso.colliderect(rect2):
+				touch = True
+
 
 	pygame.display.flip()
 	
