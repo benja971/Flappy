@@ -3,7 +3,7 @@ from random import *
 from pygame.locals import *
 
 from ctypes import windll
-windll.shcore.SetProcessDpiAwareness(5)
+windll.shcore.SetProcessDpiAwareness(3)
 
 def images():
 	bank={}
@@ -14,43 +14,40 @@ def images():
 	return bank
 
 
-def monter_perso(y):
-    y-=10
+def NewTuyeaux(bank, rect, rect2):
+	#x = randint(300 , 400)
+	x= 250
 
-    return y
-
-
-def NewTuyeaux(rect, rect2):
-	for i in range(2):
-		rect.x = randint(300 , 400)
+	for i in range(4):
+		rect.x = x
 		rect.y = randint(-100 , 100)
-		mesTuyaux.append(rect)
+		mesTuyeaux.append(rect)
 
-		rect2.x = randint(300 , 400)
+		rect2.x = x
 		rect2.y = randint(300 , 500)
-		mesTuyaux2.append(rect2)
+		mesTuyeaux2.append(rect2)
 
-	return mesTuyaux, mesTuyaux2
+		print("mesTuyeaux:" ,mesTuyeaux)
+		print("mesTuyeaux2:" ,mesTuyeaux2)
+
+	return mesTuyeaux; mesTuyeaux2
 
 
 fenetre = pygame.display.set_mode((400,600))
-horloge = pygame.time.Clock()
-
 bank = images()
-fond = pygame.image.load("bg2-bell.jpg").convert()
+horloge = pygame.time.Clock()
+continuer = True
+i = 0
+mesTuyeaux = []
+mesTuyeaux2 = []
 
 rectPerso = bank["perso"].get_rect()
-rectPerso.x = 150
-rectPerso.y = 300- rectPerso.h
+rectPerso.y = 300 - rectPerso.h
 
-rect = bank["t1"].get_rect()
-rect2 = bank["t2"].get_rect()
+rect = bank["t1"].get_rect() 
+rect2 = bank["t2"].get_rect() 
 
-mesTuyaux=[]
-mesTuyaux2=[]
-continuer = True
-state = "jeu"
-i = 0
+fond = pygame.image.load("bg2-bell.jpg").convert()
 
 pygame.key.set_repeat(4, 4)
 
@@ -58,42 +55,24 @@ while continuer:
 	touches = pygame.key.get_pressed()
 	events = pygame.event.get()
 	horloge.tick(60)	
+	i += 1
 
-	if state == "jeu":
-		i += 1
-		touch = False
-		#rectPerso.y += 4
+	rect.x -= 3.5
+	rect2.x -= 3.5
 
-		if i%60 == 0:
-			NewTuyeaux(rect, rect2)		
+	if i%120 == 0:
+		NewTuyeaux(bank, rect, rect2)
 
-		if touches[pygame.K_ESCAPE]:
-			#state = "menu"
-			continuer = 0 
+	if touches[pygame.K_ESCAPE]:
+		continuer = False
 
-		if touches[pygame.K_SPACE]:
-			rectPerso.y -= 10
+	fenetre.blit(fond, (0 ,0))
+	fenetre.blit(bank["perso"], rectPerso)
 
-		fenetre.blit(fond, (0 ,0))
-		fenetre.blit(bank["perso"], rectPerso)
+	for p in mesTuyeaux:
+		fenetre.blit(bank["t1"], p)
 
-		for r in mesTuyaux:
-			r.x -=2
-			fenetre.blit(bank["t1"], r)
-
-			if rectPerso.colliderect(r):
-				#state = "menu"
-				print("Touché")
-
-		for t in mesTuyaux2:
-			t.x -=2
-			fenetre.blit(bank["t2"], t)
-
-			if rectPerso.colliderect(t):
-				#state = "menu"
-				print("Touché")
-		print(horloge)
-				
-
+	for o in mesTuyeaux2:
+		fenetre.blit(bank["t2"], o)
 
 	pygame.display.flip()
