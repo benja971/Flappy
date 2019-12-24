@@ -18,7 +18,7 @@ def NewTuyeaux(bank, rect, rect2):
 	#x = randint(300 , 400)
 	x= 250
 
-	for i in range(4):
+	for i in range(1):
 		rect.x = x
 		rect.y = randint(-100 , 100)
 		mesTuyeaux.append(rect)
@@ -27,8 +27,8 @@ def NewTuyeaux(bank, rect, rect2):
 		rect2.y = randint(300 , 500)
 		mesTuyeaux2.append(rect2)
 
-		print("mesTuyeaux:" ,mesTuyeaux)
-		print("mesTuyeaux2:" ,mesTuyeaux2)
+		#print("mesTuyeaux:" ,mesTuyeaux)
+		#print("mesTuyeaux2:" ,mesTuyeaux2)
 
 	return mesTuyeaux; mesTuyeaux2
 
@@ -38,6 +38,7 @@ bank = images()
 horloge = pygame.time.Clock()
 continuer = True
 i = 0
+state = "menu"
 mesTuyeaux = []
 mesTuyeaux2 = []
 
@@ -55,24 +56,36 @@ while continuer:
 	touches = pygame.key.get_pressed()
 	events = pygame.event.get()
 	horloge.tick(60)	
-	i += 1
+	if state == "menu":
+		fenetre.blit(fond, (0, 0))
 
-	rect.x -= 3.5
-	rect2.x -= 3.5
+		if touches[pygame.K_ESCAPE]:
+			continuer = False
 
-	if i%120 == 0:
-		NewTuyeaux(bank, rect, rect2)
+		if touches[pygame.K_SPACE]:
+			state = "jeu"			
 
-	if touches[pygame.K_ESCAPE]:
-		continuer = False
+	if state == "jeu":
+		i += 1
 
-	fenetre.blit(fond, (0 ,0))
-	fenetre.blit(bank["perso"], rectPerso)
+		rect.x -= 3.5
+		rect2.x -= 3.5
 
-	for p in mesTuyeaux:
-		fenetre.blit(bank["t1"], p)
+		if i%120 == 0:
+			NewTuyeaux(bank, rect, rect2)
 
-	for o in mesTuyeaux2:
-		fenetre.blit(bank["t2"], o)
+		if touches[pygame.K_ESCAPE]:
+			continuer = False
+
+		fenetre.blit(fond, (0 ,0))
+		fenetre.blit(bank["perso"], rectPerso)
+
+		for p in mesTuyeaux:
+			fenetre.blit(bank["t1"], p)
+
+		for o in mesTuyeaux2:
+			fenetre.blit(bank["t2"], o)
+
+		print(horloge)
 
 	pygame.display.flip()
